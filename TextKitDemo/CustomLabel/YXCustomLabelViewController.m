@@ -9,7 +9,7 @@
 #import "YXCustomLabelViewController.h"
 #import "YXLabel.h"
 
-@interface YXCustomLabelViewController ()<YXLabelDelegate>
+@interface YXCustomLabelViewController ()
 
 @property (nonatomic, strong) YXLabel *label;
 @property (nonatomic, strong) UILabel *infoLabel;
@@ -22,8 +22,30 @@
     [super viewDidLoad];
     
     _label = [[YXLabel alloc] init];
-    _label.delegate = self;
     _label.backgroundColor = [UIColor cyanColor];
+    
+    NSMutableAttributedString *attributedString1 = [[NSMutableAttributedString alloc] initWithString:@"打开"];
+    [attributedString1 addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(0, attributedString1.length)];
+    
+    [_label yxAddAttributedString:attributedString1 option:^(NSAttributedString *attributedString) {
+        NSLog(@"打开");
+    }];
+    
+    NSMutableAttributedString *attributedString2 = [[NSMutableAttributedString alloc] initWithString:@"电扇"];
+    [attributedString2 addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedString2.length)];
+    
+    [_label yxAddAttributedString:attributedString2 option:^(NSAttributedString *attributedString) {
+        NSLog(@"电扇");
+    }];
+    
+    NSMutableAttributedString *attributedString3 = [[NSMutableAttributedString alloc] initWithString:@"哈哈"];
+    [attributedString3 addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(0, attributedString3.length)];
+    
+    [_label yxAddAttributedString:attributedString3 option:^(NSAttributedString *attributedString) {
+        NSLog(@"哈哈");
+    }];
+    
+    
     [self.view addSubview:_label];
     
     _infoLabel = [[UILabel alloc] init];
@@ -39,14 +61,5 @@
     _infoLabel.frame = CGRectMake(0, 400, self.view.bounds.size.width, 30);
 }
 
-#pragma mark - YXLabelDelegate
-
-- (void)yxLabel:(YXLabel *)label didSelectedCharacter:(unichar)character {
-    self.infoLabel.text = [NSString stringWithFormat:@"点击了：%C", character];
-}
-
-- (void)yxLabelDidSelectedBlankSpace:(YXLabel *)label {
-    self.infoLabel.text = @"点中了空白区域";
-}
 
 @end

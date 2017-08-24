@@ -10,6 +10,9 @@
 
 @interface YXLabel ()
 
+@property (nonatomic, strong) NSMutableArray<NSAttributedString *> *subAttributedStrings;
+@property (nonatomic, strong) NSMutableArray<NSValue *> *subAttributedStringRanges;
+@property (nonatomic, strong) NSMutableArray<YXStringOption> *stringOptions;
 @property (nonatomic, strong) NSTextStorage *textStorage;
 @property (nonatomic, strong) NSLayoutManager *layoutManager;
 @property (nonatomic, strong) NSTextContainer *textContainer;
@@ -18,11 +21,28 @@
 
 @implementation YXLabel
 
+#pragma mark - setter 
+
+- (void)setText:(NSString *)text {
+    [super setText:text];
+    [self setupTextSystem];
+}
+
+- (void)setAttributedText:(NSAttributedString *)attributedText {
+    [super setAttributedText:attributedText];
+    [self setupTextSystem];
+}
+
+#pragma mark - override
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         self.userInteractionEnabled = YES;
+        _subAttributedStrings       = [NSMutableArray array];
+        _subAttributedStringRanges  = [NSMutableArray array];
+        _stringOptions              = [NSMutableArray array];
         [self setupTextSystem];
     }
     return self;
@@ -35,8 +55,6 @@
     
     [_textStorage addLayoutManager:_layoutManager];
     [_layoutManager addTextContainer:_textContainer];
-    
-    [_textStorage replaceCharactersInRange:NSMakeRange(0, 0) withString:@"我是一个可点击的label"];
 }
 
 - (void)layoutSubviews {
@@ -51,6 +69,8 @@
     [self.layoutManager drawGlyphsForGlyphRange:range atPoint:CGPointMake(0, 0)];
 }
 
+#pragma mark - event response
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     UITouch *touch = touches.anyObject;
     CGPoint point = [touch locationInView:self];
@@ -61,16 +81,29 @@
     //最终判断该字形的显示范围是否包括点击的 location
     if (CGRectContainsPoint(glyphRect, point)) {
         NSUInteger characterIndex = [self.layoutManager characterIndexForGlyphAtIndex:glyphIndex];
-        unichar character = [[self.textStorage string] characterAtIndex:characterIndex];
-        if ([self.delegate respondsToSelector:@selector(yxLabel:didSelectedCharacter:)]) {
-            [self.delegate yxLabel:self didSelectedCharacter:character];
-        }
-    } else {
-        //点中了空白区域
-        if ([self.delegate respondsToSelector:@selector(yxLabelDidSelectedBlankSpace:)]) {
-            [self.delegate yxLabelDidSelectedBlankSpace:self];
-        }
+        
+        [self.subAttributedStringRanges enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSRange range = obj.rangeValue;
+            if (NSLocationInRange(characterIndex, range)) {
+                YXStringOption option = self.stringOptions[idx];
+                option(self.subAttributedStrings[idx]);
+            }
+        }];
+        
     }
+}
+
+#pragma mark - public method
+
+- (void)yxAddAttributedString:(NSAttributedString *)attributedString option:(void (^)(NSAttributedString *))option {
+    [self.subAttributedStrings addObject:attributedString];
+    
+    NSRange range = NSMakeRange(self.textStorage.length, attributedString.length);
+    [self.subAttributedStringRanges addObject:[NSValue valueWithRange:range]];
+    
+    [self.stringOptions addObject:option];
+    
+    [self.textStorage appendAttributedString:attributedString];
 }
 
 @end

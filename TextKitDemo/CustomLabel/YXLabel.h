@@ -7,18 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-@class YXLabel;
 
-@protocol YXLabelDelegate <NSObject>
-
-- (void)yxLabel:(YXLabel *)label didSelectedCharacter:(unichar)character;
-- (void)yxLabelDidSelectedBlankSpace:(YXLabel *)label;
-
-@end
+typedef void(^YXStringOption)(NSAttributedString *attributedString);
 
 @interface YXLabel : UILabel
 
-@property (nonatomic, weak) id<YXLabelDelegate> delegate;
+/**
+ 添加一个NSAttributedString，并关联事件
 
+ @param attributedString 属性字符串
+ @param option 事件
+ */
+- (void)yxAddAttributedString:(NSAttributedString *)attributedString option:(YXStringOption)option;
 
 @end
