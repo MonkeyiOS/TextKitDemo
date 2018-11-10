@@ -28,21 +28,21 @@
     [attributedString1 addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(0, attributedString1.length)];
     
     [_label yxAddAttributedString:attributedString1 option:^(NSAttributedString *attributedString) {
-        NSLog(@"打开");
+        _infoLabel.text = @"打开";
     }];
     
     NSMutableAttributedString *attributedString2 = [[NSMutableAttributedString alloc] initWithString:@"电扇"];
     [attributedString2 addAttribute:NSForegroundColorAttributeName value:[UIColor redColor] range:NSMakeRange(0, attributedString2.length)];
     
     [_label yxAddAttributedString:attributedString2 option:^(NSAttributedString *attributedString) {
-        NSLog(@"电扇");
+        _infoLabel.text = @"电扇";
     }];
     
     NSMutableAttributedString *attributedString3 = [[NSMutableAttributedString alloc] initWithString:@"哈哈"];
     [attributedString3 addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:NSMakeRange(0, attributedString3.length)];
     
     [_label yxAddAttributedString:attributedString3 option:^(NSAttributedString *attributedString) {
-        NSLog(@"哈哈");
+        _infoLabel.text = @"哈哈";
     }];
     
     
